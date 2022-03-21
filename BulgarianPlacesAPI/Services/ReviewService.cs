@@ -38,7 +38,8 @@ namespace BulgarianPlacesAPI.Services
                     Image = x.Image,
                     Date = x.DateCreated.ToString("dd/MM/yyyy"),
                     Comment = x.Description,
-                    Creator = x.User.FirstName + " " + x.User.LastName,
+                    Creator = "by " + x.User.FirstName + " " + x.User.LastName,
+                    Rating = x.Rating
                 })
                 .FirstOrDefault();
         }

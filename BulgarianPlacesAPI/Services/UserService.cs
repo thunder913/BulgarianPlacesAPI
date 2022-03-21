@@ -43,11 +43,11 @@ namespace BulgarianPlacesAPI.Services
                     Description = x.Description,
                     Image = x.Image,
                     Name = x.FirstName + " " + x.LastName,
-                    Visited = x.Reviews.Count(),
-                    VisitedLastMonth = x.Reviews.Where(y => y.DateCreated >= DateTime.UtcNow.AddMonths(-1)).Count(),
-                    PlacesVisited = x.Reviews.Select(y => new ProfilePlaceVisited() 
+                    Visited = x.Reviews.Count(y => y.Status == ReviewStatus.Approved),
+                    VisitedLastMonth = x.Reviews.Where(y => y.Status == ReviewStatus.Approved && y.DateCreated >= DateTime.UtcNow.AddMonths(-1)).Count(),
+                    PlacesVisited = x.Reviews.Where(y => y.Status == ReviewStatus.Approved).Select(y => new ProfilePlaceVisited() 
                     {
-                        Date = y.DateCreated,
+                        Date = y.DateCreated.ToString("dd/MM/yyyy"),
                         Id = y.Id,
                         PlaceName = y.Place.Name,
                         Rating = y.Rating,

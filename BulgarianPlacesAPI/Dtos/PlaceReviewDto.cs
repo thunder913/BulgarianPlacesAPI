@@ -7,5 +7,6 @@
         public string Date { get; set; }
         public string Creator { get; set; }
         public string Comment { get; set; }
+        public int Rating { get; set; }
     }
 }
