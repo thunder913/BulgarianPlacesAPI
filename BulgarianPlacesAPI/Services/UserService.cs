@@ -51,7 +51,7 @@ namespace BulgarianPlacesAPI.Services
                         Id = y.Id,
                         PlaceName = y.Place.Name,
                         Rating = y.Rating,
-                    }).ToList()
+                    }).ToList(),
                 })
                 .FirstOrDefault();
         }

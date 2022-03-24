@@ -38,6 +38,8 @@ namespace BulgarianPlacesAPI.Controllers
                 message = "success",
                 email = user.Email,
                 jwtToken = jwt,
+                Id = user.Id,
+                IsAdmin = user.UserType == UserType.Admin,
             });
         }
 
@@ -86,16 +88,34 @@ namespace BulgarianPlacesAPI.Controllers
             }
         }
 
-        protected User GetUserByToken()
+        [HttpPost("VerifyToken")]
+        public IActionResult VerifyToken(string token)
         {
-            var jwt = Request.Cookies["jwt"];
-            if (jwt == null)
+            try
+            {
+                var user = this.GetUserByToken(token);
+                if (user == null)
+                {
+                    return BadRequest("Invalid token!");
+                }
+                return Ok(new { Id = user.Id, IsAdmin = user.UserType == UserType.Admin });
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
+
+        }
+
+        protected User GetUserByToken(string token)
+        {
+            if (token == null)
             {
                 return null;
             }
-            var token = this.jwtService.Verify(jwt);
+            var verify = this.jwtService.Verify(token);
 
-            var userId = token.Id;
+            var userId = verify.Id;
 
             return this.userService.GetById(int.Parse(userId));
         }
