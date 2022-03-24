@@ -91,7 +91,7 @@ namespace BulgarianPlacesAPI.Services
                         Id = x.Id,
                         Image = x.Image,
                         Name = x.FirstName + " " + x.LastName,
-                        PlacesVisited = x.Reviews.Count(y => y.DateCreated.Month >= DateTime.UtcNow.Month && y.Status == ReviewStatus.Approved),
+                        PlacesVisited = x.Reviews.Count(y => y.DateCreated.Month >= DateTime.UtcNow.Month && y.DateCreated.Year == DateTime.UtcNow.Year && y.Status == ReviewStatus.Approved),
                     })
                     .OrderByDescending(x => x.PlacesVisited)
                     .Take(100)

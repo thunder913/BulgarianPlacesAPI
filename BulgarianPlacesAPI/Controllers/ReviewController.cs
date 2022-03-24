@@ -12,35 +12,46 @@ namespace BulgarianPlacesAPI.Controllers
     public class ReviewController : ControllerBase
     {
         private readonly IReviewService reviewService;
+        private readonly IUserService userService;
+        private readonly IJwtService jwtService;
 
-        public ReviewController(IReviewService reviewService)
+        public ReviewController(IReviewService reviewService, IUserService userService, IJwtService jwtService)
         {
             this.reviewService = reviewService;
+            this.userService = userService;
+            this.jwtService = jwtService;
         }
 
         [HttpPost("add")]
         public async Task<IActionResult> AddReview(string image, int rating, string description, decimal chosenLatitude, 
-            decimal chosenLongitude, bool isAtLocation, decimal userLatitude, decimal userLongitude, int placeId, int userId)
+            decimal chosenLongitude, bool isAtLocation, decimal userLatitude, decimal userLongitude, int placeId, string jwt)
         {
             //TODO save image to azure or something and then save it as a link in the DB
-
-            var review = new Review()
+            try
             {
-                Image = image,
-                Rating = rating,
-                Description = description,
-                PlaceLatitude = chosenLatitude,
-                PlaceLongitude = chosenLongitude,
-                IsAtLocation = isAtLocation,
-                UserLatitude = userLatitude,
-                UserLongitude = userLongitude,
-                Status = ReviewStatus.Submitted,
-                DateCreated = DateTime.UtcNow,
-                PlaceId = placeId,
-                UserId = userId
-            };
+                var user = this.GetUserByToken(jwt);
+                var review = new Review()
+                {
+                    Image = image,
+                    Rating = rating,
+                    Description = description,
+                    PlaceLatitude = chosenLatitude,
+                    PlaceLongitude = chosenLongitude,
+                    IsAtLocation = isAtLocation,
+                    UserLatitude = userLatitude,
+                    UserLongitude = userLongitude,
+                    Status = ReviewStatus.Submitted,
+                    DateCreated = DateTime.UtcNow,
+                    PlaceId = placeId,
+                    UserId = user.Id
+                };
 
-            return Ok(await this.reviewService.AddReviewAsync(review));
+                return Ok(await this.reviewService.AddReviewAsync(review));
+            }
+            catch (Exception)
+            {
+                return BadRequest("Your token is invalid!");
+            }
         }
 
         [HttpGet("{id}")]
@@ -87,6 +98,19 @@ namespace BulgarianPlacesAPI.Controllers
             {
                 return BadRequest();
             }
+        }
+
+        protected User GetUserByToken(string token)
+        {
+            if (token == null)
+            {
+                return null;
+            }
+            var verify = this.jwtService.Verify(token);
+
+            var userId = verify.Id;
+
+            return this.userService.GetById(int.Parse(userId));
         }
     }
 }

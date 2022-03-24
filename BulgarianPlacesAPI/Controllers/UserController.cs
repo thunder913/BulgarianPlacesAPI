@@ -104,7 +104,6 @@ namespace BulgarianPlacesAPI.Controllers
             {
                 return BadRequest();
             }
-
         }
 
         protected User GetUserByToken(string token)
