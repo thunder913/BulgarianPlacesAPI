@@ -58,7 +58,7 @@ namespace BulgarianPlacesAPI.Services
 
         public List<RankingUserDto> GetUserRanking(RankingType rankingType)
         {
-            var users = this.dbContext.Users.Include(x => x.Reviews).AsQueryable();
+            var users = this.dbContext.Users.Include(x => x.Reviews).Where(x => x.HasCompletedFirstTime).AsQueryable();
             var toReturn = new List<RankingUserDto>();
             var date = DateTime.UtcNow;
             switch (rankingType)
@@ -81,6 +81,7 @@ namespace BulgarianPlacesAPI.Services
                         PlacesVisited = x.Reviews.Count(y => y.DateCreated >= date && y.Status == ReviewStatus.Approved),
                     })
                     .OrderByDescending(x => x.PlacesVisited)
+                    .Take(100)
                     .ToList();
 
                     break;
@@ -93,6 +94,7 @@ namespace BulgarianPlacesAPI.Services
                         PlacesVisited = x.Reviews.Count(y => y.DateCreated.Month >= DateTime.UtcNow.Month && y.Status == ReviewStatus.Approved),
                     })
                     .OrderByDescending(x => x.PlacesVisited)
+                    .Take(100)
                     .ToList();
                     break;
                 case RankingType.Yearly:
@@ -104,6 +106,7 @@ namespace BulgarianPlacesAPI.Services
                         PlacesVisited = x.Reviews.Count(y => y.DateCreated.Year == DateTime.UtcNow.Year && y.Status == ReviewStatus.Approved),
                     })
                     .OrderByDescending(x => x.PlacesVisited)
+                    .Take(100)
                     .ToList();
                     break;
                 case RankingType.AllTime:
@@ -115,6 +118,7 @@ namespace BulgarianPlacesAPI.Services
                         PlacesVisited = x.Reviews.Count(y => y.Status == ReviewStatus.Approved),
                     })
                     .OrderByDescending(x => x.PlacesVisited)
+                    .Take(100)
                     .ToList();
                     break;
             }
@@ -147,6 +151,7 @@ namespace BulgarianPlacesAPI.Services
             user.LastName = lastName;
             user.Image = image;
             user.Description = description;
+            user.HasCompletedFirstTime = true;
             await this.dbContext.SaveChangesAsync();
         }
 

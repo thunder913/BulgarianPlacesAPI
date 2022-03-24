@@ -14,5 +14,6 @@ namespace BulgarianPlacesAPI.Models
         public string Description { get; set; }
         public virtual ICollection<Review> Reviews { get; set; } = new HashSet<Review>();
         public UserType UserType { get; set; } = UserType.User;
+        public bool HasCompletedFirstTime { get; set; }
     }
 }
