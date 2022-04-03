@@ -24,7 +24,7 @@ namespace BulgarianPlacesAPI.Controllers
 
         [HttpPost("add")]
         public async Task<IActionResult> AddReview(string image, int rating, string description, decimal chosenLatitude, 
-            decimal chosenLongitude, bool isAtLocation, decimal userLatitude, decimal userLongitude, int placeId, string jwt)
+            decimal chosenLongitude, bool isAtLocation, decimal userLatitude, decimal userLongitude, string jwt)
         {
             //TODO save image to azure or something and then save it as a link in the DB
             try
@@ -42,7 +42,6 @@ namespace BulgarianPlacesAPI.Controllers
                     UserLongitude = userLongitude,
                     Status = ReviewStatus.Submitted,
                     DateCreated = DateTime.UtcNow,
-                    PlaceId = placeId,
                     UserId = user.Id
                 };
 
