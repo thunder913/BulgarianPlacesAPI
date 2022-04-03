@@ -41,6 +41,7 @@ namespace BulgarianPlacesAPI
             services.AddTransient<IJwtService, JwtService>();
             services.AddTransient<IUserService, UserService>();
             services.AddTransient<IReviewService, ReviewService>();
+            services.AddTransient<IPlaceService, PlaceService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
