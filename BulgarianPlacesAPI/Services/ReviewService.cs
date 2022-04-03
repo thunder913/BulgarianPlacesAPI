@@ -67,6 +67,7 @@ namespace BulgarianPlacesAPI.Services
                 .Where(x => x.Id == id)
                 .Select(x => new AdminApprovalDto()
                 {
+                    Id = x.Id,
                     Checkbox = x.IsAtLocation,
                     Date = x.DateCreated.ToString("dd/MM/yyyy"),
                     Description = x.Description,
