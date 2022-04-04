@@ -33,5 +33,24 @@ namespace BulgarianPlacesAPI.Services
                 })
                 .ToList();
         }
+
+        public PlaceDto GetPlaceById(int id)
+        {
+            return this.dbContext
+                .Places
+                .Include(x => x.Reviews)
+                .Where(x => x.Id == id)
+                .Select(x => new PlaceDto()
+                {
+                    Id = x.Id,
+                    Image = x.Image,
+                    Latitude = x.Latitude,
+                    Longitude = x.Longitude,
+                    Name = x.Name,
+                    Rating = x.Reviews.Where(y => y.Status == ReviewStatus.Approved).Sum(y => y.Rating) / x.Reviews.Count,
+                    Visits = x.Reviews.Where(y => y.Status == ReviewStatus.Approved).Count(),
+                })
+                .SingleOrDefault();
+        }
     }
 }

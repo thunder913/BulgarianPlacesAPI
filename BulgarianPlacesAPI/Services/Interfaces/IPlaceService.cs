@@ -6,5 +6,6 @@ namespace BulgarianPlacesAPI.Services.Interfaces
     public interface IPlaceService
     {
         List<SearchDto> SearchPlaces(string text);
+        PlaceDto GetPlaceById(int id);
     }
 }

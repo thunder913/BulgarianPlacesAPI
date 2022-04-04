@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BulgarianPlacesAPI.Models
 {
@@ -12,5 +13,9 @@ namespace BulgarianPlacesAPI.Models
         public virtual User CreatedBy { get; set; }
         public int CreatedById { get; set; }
         public string Name { get; set; }
+        [Column(TypeName = "decimal(11, 8)")]
+        public decimal? Latitude { get; set; }
+        [Column(TypeName = "decimal(11, 8)")]
+        public decimal? Longitude { get; set; }
     }
 }
