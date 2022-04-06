@@ -1,4 +1,5 @@
-﻿using BulgarianPlacesAPI.Models;
+﻿using BulgarianPlacesAPI.Dtos;
+using BulgarianPlacesAPI.Models;
 using BulgarianPlacesAPI.Models.Enums;
 using BulgarianPlacesAPI.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -23,23 +24,22 @@ namespace BulgarianPlacesAPI.Controllers
         }
 
         [HttpPost("add")]
-        public async Task<IActionResult> AddReview(string image, int rating, string description, decimal chosenLatitude, 
-            decimal chosenLongitude, bool isAtLocation, decimal userLatitude, decimal userLongitude, string jwt)
+        public async Task<IActionResult> AddReview([FromForm] AddReviewProperties props)
         {
             //TODO save image to azure or something and then save it as a link in the DB
             try
             {
-                var user = this.GetUserByToken(jwt);
+                var user = this.GetUserByToken(props.jwt);
                 var review = new Review()
                 {
-                    Image = image,
-                    Rating = rating,
-                    Description = description,
-                    PlaceLatitude = chosenLatitude,
-                    PlaceLongitude = chosenLongitude,
-                    IsAtLocation = isAtLocation,
-                    UserLatitude = userLatitude,
-                    UserLongitude = userLongitude,
+                    Image = props.Image,
+                    Rating = props.rating,
+                    Description = props.Description,
+                    PlaceLatitude = props.chosenLatitude,
+                    PlaceLongitude = props.chosenLongitude,
+                    IsAtLocation = props.isAtLocation,
+                    UserLatitude = props.userLatitude,
+                    UserLongitude = props.userLongitude,
                     Status = ReviewStatus.Submitted,
                     DateCreated = DateTime.UtcNow,
                     UserId = user.Id
@@ -47,7 +47,7 @@ namespace BulgarianPlacesAPI.Controllers
 
                 return Ok(await this.reviewService.AddReviewAsync(review));
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 return BadRequest("Your token is invalid!");
             }
