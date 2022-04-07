@@ -1,3 +1,5 @@
+using Azure.Storage.Blobs;
+using BlobStorage;
 using BulgarianPlacesAPI.Data;
 using BulgarianPlacesAPI.Services;
 using BulgarianPlacesAPI.Services.Interfaces;
@@ -38,10 +40,13 @@ namespace BulgarianPlacesAPI
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "BulgarianPlacesAPI", Version = "v1" });
             });
+            services.AddSingleton(x =>
+                new BlobServiceClient(this.Configuration.GetValue<string>("AzureBlobStorage:ConnectionString")));
             services.AddTransient<IJwtService, JwtService>();
             services.AddTransient<IUserService, UserService>();
             services.AddTransient<IReviewService, ReviewService>();
             services.AddTransient<IPlaceService, PlaceService>();
+            services.AddSingleton<IBlobService, BlobService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -1,12 +1,11 @@
+using Azure.Identity;
+using Azure.Security.KeyVault.Secrets;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
+using Microsoft.Extensions.DependencyInjection;
+using Azure.Extensions.AspNetCore.Configuration.Secrets;
 namespace BulgarianPlacesAPI
 {
     public class Program

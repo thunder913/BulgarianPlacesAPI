@@ -32,7 +32,6 @@ namespace BulgarianPlacesAPI.Controllers
                 var user = this.GetUserByToken(props.jwt);
                 var review = new Review()
                 {
-                    Image = props.Image,
                     Rating = props.rating,
                     Description = props.Description,
                     PlaceLatitude = props.chosenLatitude,
@@ -45,9 +44,9 @@ namespace BulgarianPlacesAPI.Controllers
                     UserId = user.Id
                 };
 
-                return Ok(await this.reviewService.AddReviewAsync(review));
+                return Ok(await this.reviewService.AddReviewAsync(review, props.Image));
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return BadRequest("Your token is invalid!");
             }

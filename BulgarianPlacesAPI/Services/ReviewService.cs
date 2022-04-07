@@ -1,4 +1,5 @@
-﻿using BulgarianPlacesAPI.Data;
+﻿using BlobStorage;
+using BulgarianPlacesAPI.Data;
 using BulgarianPlacesAPI.Dtos;
 using BulgarianPlacesAPI.Models;
 using BulgarianPlacesAPI.Models.Enums;
@@ -14,13 +15,18 @@ namespace BulgarianPlacesAPI.Services
     public class ReviewService : IReviewService
     {
         private readonly ApplicationDbContext dbContext;
+        private readonly IBlobService blobService;
 
-        public ReviewService(ApplicationDbContext dbContext)
+        public ReviewService(ApplicationDbContext dbContext, IBlobService blobService)
         {
             this.dbContext = dbContext;
+            this.blobService = blobService;
         }
-        public async Task<int> AddReviewAsync(Review review)
+        public async Task<int> AddReviewAsync(Review review, string base64Image)
         {
+            var name = Guid.NewGuid().ToString() + ".jpeg";
+            await blobService.UploadBase64StringAsync(base64Image, name, "images");
+            review.Image = name;
             await this.dbContext.AddAsync(review);
             await this.dbContext.SaveChangesAsync();
             return review.Id;
@@ -72,7 +78,7 @@ namespace BulgarianPlacesAPI.Services
                     Date = x.DateCreated.ToString("dd/MM/yyyy"),
                     Description = x.Description,
                     Email = x.User.Email,
-                    Image = x.Image,
+                    Image = this.blobService.GetBlobUrlAsync(x.Image, "images").GetAwaiter().GetResult(),
                     LocationLatitude = x.PlaceLatitude,
                     LocationLongitude = x.PlaceLongitude,
                     Name = x.User.FirstName + " " + x.User.LastName,

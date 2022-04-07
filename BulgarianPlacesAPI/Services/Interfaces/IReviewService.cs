@@ -8,7 +8,7 @@ namespace BulgarianPlacesAPI.Services.Interfaces
 {
     public interface IReviewService
     {
-        Task<int> AddReviewAsync(Review review);
+        Task<int> AddReviewAsync(Review review, string bae64Image);
         PlaceReviewDto GetReviewById(int id);
         List<AdminPanelDto> GetAdminPanelItems();
         AdminApprovalDto GetReviewToApproveById(int id);
