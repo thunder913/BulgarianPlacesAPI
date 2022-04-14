@@ -12,6 +12,6 @@ namespace BulgarianPlacesAPI.Services.Interfaces
         PlaceReviewDto GetReviewById(int id);
         List<AdminPanelDto> GetAdminPanelItems();
         AdminApprovalDto GetReviewToApproveById(int id);
-        Task ChangeReviewStatusAsync(int id, ReviewStatus status);
+        Task ChangeReviewStatusAsync(AdminRequest request, ReviewStatus status);
     }
 }

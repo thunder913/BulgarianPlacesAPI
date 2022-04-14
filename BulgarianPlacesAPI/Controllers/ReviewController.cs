@@ -70,12 +70,18 @@ namespace BulgarianPlacesAPI.Controllers
             return Ok(this.reviewService.GetReviewToApproveById(id));
         }
 
-        [HttpPost("approve/{id}")]
-        public async Task<IActionResult> ApproveReview(int id)
+        [HttpPost("approve")]
+        public async Task<IActionResult> ApproveReview([FromForm] AdminRequest request)
         {
             try
             {
-                await this.reviewService.ChangeReviewStatusAsync(id, ReviewStatus.Approved);
+                var user = this.GetUserByToken(request.JwtToken);
+                if (request.PlaceId is null && string.IsNullOrWhiteSpace(request.PlaceName))
+                {
+                    return BadRequest();
+                }
+                request.UserId = user.Id;
+                await this.reviewService.ChangeReviewStatusAsync(request, ReviewStatus.Approved);
                 return Ok();
             }
             catch (Exception)
@@ -84,12 +90,14 @@ namespace BulgarianPlacesAPI.Controllers
             }
         }
 
-        [HttpPost("decline/{id}")]
-        public async Task<IActionResult> DeclineReview(int id)
+        [HttpPost("decline")]
+        public async Task<IActionResult> DeclineReview([FromForm] AdminRequest request)
         {
             try
             {
-                await this.reviewService.ChangeReviewStatusAsync(id, ReviewStatus.Declined);
+                var user = this.GetUserByToken(request.JwtToken);
+                request.UserId = user.Id;
+                await this.reviewService.ChangeReviewStatusAsync(request, ReviewStatus.Declined);
                 return Ok();
             }
             catch (Exception)

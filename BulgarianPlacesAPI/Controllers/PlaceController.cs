@@ -19,5 +19,11 @@ namespace BulgarianPlacesAPI.Controllers
         {
             return Ok(this.placeService.GetPlaceById(id));
         }
+
+        [HttpGet("Search/{name}")]
+        public IActionResult Search(string name)
+        {
+            return Ok(this.placeService.SearchPlaces(name));
+        }
     }
 }

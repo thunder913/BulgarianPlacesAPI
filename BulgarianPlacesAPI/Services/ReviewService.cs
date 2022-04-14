@@ -88,15 +88,37 @@ namespace BulgarianPlacesAPI.Services
                 .FirstOrDefault();
         }
 
-        public async Task ChangeReviewStatusAsync(int id, ReviewStatus status)
+        public async Task ChangeReviewStatusAsync(AdminRequest request, ReviewStatus status)
         {
             var review = this.dbContext
                 .Reviews
-                .FirstOrDefault(x => x.Id == id);
+                .FirstOrDefault(x => x.Id == request.Id);
+            if (status != ReviewStatus.Declined)
+            {
+                int? placeId = request.PlaceId ?? null;
+                if (placeId is null)
+                {
+                    var place = this.dbContext.Places.Add(new Place()
+                    {
+                        CreatedById = request.UserId,
+                        CreatedOn = DateTime.UtcNow,
+                        Latitude = review.PlaceLatitude,
+                        Longitude = review.PlaceLongitude,
+                        Name = request.PlaceName,
+                        Image = review.Image,
+                    });
+
+
+                    review.Place = place.Entity;
+                }
+                else
+                {
+                    review.PlaceId = request.PlaceId;
+                }
+            }
 
             review.Status = status;
             review.DateModified = DateTime.UtcNow;
-
             await this.dbContext.SaveChangesAsync();
         }
     }
