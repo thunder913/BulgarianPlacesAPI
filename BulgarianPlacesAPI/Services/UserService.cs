@@ -44,7 +44,7 @@ namespace BulgarianPlacesAPI.Services
                     Image = x.Image,
                     Name = x.FirstName + " " + x.LastName,
                     Visited = x.Reviews.Count(y => y.Status == ReviewStatus.Approved),
-                    VisitedLastMonth = x.Reviews.Where(y => y.Status == ReviewStatus.Approved && y.DateCreated >= DateTime.UtcNow.AddMonths(-1)).Count(),
+                    VisitedLastMonth = x.Reviews.Count(y => y.DateCreated.Month >= DateTime.UtcNow.Month && y.DateCreated.Year == DateTime.UtcNow.Year && y.Status == ReviewStatus.Approved),
                     PlacesVisited = x.Reviews.Where(y => y.Status == ReviewStatus.Approved).Select(y => new ProfilePlaceVisited() 
                     {
                         Date = y.DateCreated.ToString("dd/MM/yyyy"),

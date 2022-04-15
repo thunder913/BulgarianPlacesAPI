@@ -27,7 +27,7 @@ namespace BulgarianPlacesAPI.Services
                 {
                     Id = x.Id,
                     Image = x.Image,
-                    LastColumnValue = (x.Reviews.Where(y => y.Status == ReviewStatus.Approved).Sum(y => y.Rating))/(x.Reviews.Count(y => y.Status == ReviewStatus.Approved)),
+                    LastColumnValue = (x.Reviews.Where(y => y.Status == ReviewStatus.Approved).Sum(y => y.Rating))/(x.Reviews.Count(y => y.Status == ReviewStatus.Approved) != 0 ? x.Reviews.Count(y => y.Status == ReviewStatus.Approved) : 1),
                     Name = x.Name,
                     SearchType = SearchResultType.Place,
                 })

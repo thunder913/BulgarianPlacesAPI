@@ -78,7 +78,11 @@ namespace BulgarianPlacesAPI.Controllers
                 var user = this.GetUserByToken(request.JwtToken);
                 if (request.PlaceId is null && string.IsNullOrWhiteSpace(request.PlaceName))
                 {
-                    return BadRequest();
+                    return BadRequest("Провери, дали си избрал мястото, където се намира ревюто.");
+                }
+                else if (user.UserType != UserType.Admin)
+                {
+                    return BadRequest("Нямаш права, да извършваш тази дейност!");
                 }
                 request.UserId = user.Id;
                 await this.reviewService.ChangeReviewStatusAsync(request, ReviewStatus.Approved);

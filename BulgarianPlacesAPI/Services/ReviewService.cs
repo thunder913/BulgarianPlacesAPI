@@ -56,6 +56,7 @@ namespace BulgarianPlacesAPI.Services
                 .Reviews
                 .Include(x => x.User)
                 .Where(x => x.Status == ReviewStatus.Submitted)
+                .OrderByDescending(x => x.DateCreated)
                 .Select(x => new AdminPanelDto()
                 {
                     DateSubmitted = x.DateCreated.ToString("dd/MM/yyyy"),
