@@ -1,4 +1,5 @@
-﻿using BulgarianPlacesAPI.Data;
+﻿using BlobStorage;
+using BulgarianPlacesAPI.Data;
 using BulgarianPlacesAPI.Dtos;
 using BulgarianPlacesAPI.Models;
 using BulgarianPlacesAPI.Models.Enums;
@@ -15,10 +16,12 @@ namespace BulgarianPlacesAPI.Services
     public class UserService : IUserService
     {
         private readonly ApplicationDbContext dbContext;
+        private readonly IBlobService blobService;
 
-        public UserService(ApplicationDbContext dbContext)
+        public UserService(ApplicationDbContext dbContext, IBlobService blobService)
         {
             this.dbContext = dbContext;
+            this.blobService = blobService;
         }
 
         public User GetByEmail(string email)
@@ -41,7 +44,7 @@ namespace BulgarianPlacesAPI.Services
                 .Select(x => new ProfileDto()
                 {
                     Description = x.Description,
-                    Image = x.Image,
+                    Image = this.blobService.GetBlobUrlAsync(x.Image, "images").GetAwaiter().GetResult(),
                     Name = x.FirstName + " " + x.LastName,
                     Visited = x.Reviews.Count(y => y.Status == ReviewStatus.Approved),
                     VisitedLastMonth = x.Reviews.Count(y => y.DateCreated.Month >= DateTime.UtcNow.Month && y.DateCreated.Year == DateTime.UtcNow.Year && y.Status == ReviewStatus.Approved),
@@ -76,7 +79,7 @@ namespace BulgarianPlacesAPI.Services
                     toReturn = users.Select(x => new RankingUserDto()
                     {
                         Id = x.Id,
-                        Image = x.Image,
+                        Image = this.blobService.GetBlobUrlAsync(x.Image, "images").GetAwaiter().GetResult(),
                         Name = x.FirstName + " " + x.LastName,
                         PlacesVisited = x.Reviews.Count(y => y.DateCreated >= date && y.Status == ReviewStatus.Approved),
                     })
@@ -89,7 +92,7 @@ namespace BulgarianPlacesAPI.Services
                     toReturn = users.Select(x => new RankingUserDto()
                     {
                         Id = x.Id,
-                        Image = x.Image,
+                        Image = this.blobService.GetBlobUrlAsync(x.Image, "images").GetAwaiter().GetResult(),
                         Name = x.FirstName + " " + x.LastName,
                         PlacesVisited = x.Reviews.Count(y => y.DateCreated.Month >= DateTime.UtcNow.Month && y.DateCreated.Year == DateTime.UtcNow.Year && y.Status == ReviewStatus.Approved),
                     })
@@ -101,7 +104,7 @@ namespace BulgarianPlacesAPI.Services
                     toReturn = users.Select(x => new RankingUserDto()
                     {
                         Id = x.Id,
-                        Image = x.Image,
+                        Image = this.blobService.GetBlobUrlAsync(x.Image, "images").GetAwaiter().GetResult(),
                         Name = x.FirstName + " " + x.LastName,
                         PlacesVisited = x.Reviews.Count(y => y.DateCreated.Year == DateTime.UtcNow.Year && y.Status == ReviewStatus.Approved),
                     })
@@ -113,7 +116,7 @@ namespace BulgarianPlacesAPI.Services
                     toReturn = users.Select(x => new RankingUserDto()
                     {
                         Id = x.Id,
-                        Image = x.Image,
+                        Image = this.blobService.GetBlobUrlAsync(x.Image, "images").GetAwaiter().GetResult(),
                         Name = x.FirstName + " " + x.LastName,
                         PlacesVisited = x.Reviews.Count(y => y.Status == ReviewStatus.Approved),
                     })
@@ -141,15 +144,20 @@ namespace BulgarianPlacesAPI.Services
         public async Task FinishFirstTimePopUpAsync(int id, string firstName, string lastName, string image, string description)
         {
             var user = this.dbContext.Users.FirstOrDefault(x => x.Id == id);
-
-            if (!string.IsNullOrWhiteSpace(firstName) && !string.IsNullOrWhiteSpace(lastName) && !string.IsNullOrWhiteSpace(image) && !string.IsNullOrWhiteSpace(description))
+            if (user.HasCompletedFirstTime)
             {
-                throw new Exception("User already has filled properties!");
+                throw new Exception("User has already completed first time setup!");
+            }
+            if (string.IsNullOrWhiteSpace(firstName) || string.IsNullOrWhiteSpace(lastName) || string.IsNullOrWhiteSpace(image) || string.IsNullOrWhiteSpace(description))
+            {
+                throw new Exception("Some properties are empty!");
             }
 
             user.FirstName = firstName;
             user.LastName = lastName;
-            user.Image = image;
+            var name = Guid.NewGuid().ToString() + ".jpeg";
+            await blobService.UploadBase64StringAsync(image, name, "images");
+            user.Image = name;
             user.Description = description;
             user.HasCompletedFirstTime = true;
             await this.dbContext.SaveChangesAsync();
@@ -164,7 +172,7 @@ namespace BulgarianPlacesAPI.Services
                 .Select(x => new SearchDto()
                 {
                     Id = x.Id,
-                    Image = x.Image,
+                    Image = this.blobService.GetBlobUrlAsync(x.Image, "images").GetAwaiter().GetResult(),
                     LastColumnValue = x.Reviews.Count(y => y.Status == ReviewStatus.Approved),
                     Name = x.FirstName + " " + x.LastName,
                     SearchType = SearchResultType.Person

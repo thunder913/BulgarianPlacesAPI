@@ -1,4 +1,5 @@
-﻿using BulgarianPlacesAPI.Models;
+﻿using BulgarianPlacesAPI.Dtos;
+using BulgarianPlacesAPI.Models;
 using BulgarianPlacesAPI.Models.Enums;
 using BulgarianPlacesAPI.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -40,6 +41,7 @@ namespace BulgarianPlacesAPI.Controllers
                 jwtToken = jwt,
                 Id = user.Id,
                 IsAdmin = user.UserType == UserType.Admin,
+                HasCompletedFirstTime = user.HasCompletedFirstTime,
             });
         }
 
@@ -74,11 +76,16 @@ namespace BulgarianPlacesAPI.Controllers
         }
 
         [HttpPost("FinishFirstTime")]
-        public async Task<IActionResult> FinishFirstTimePopUp(int id, string firstName, string lastName, string image, string description)
+        public async Task<IActionResult> FinishFirstTimePopUp([FromForm] FinishFirstTimeRequest request)
         {
             try
             {
-                await this.userService.FinishFirstTimePopUpAsync(id, firstName, lastName, image, description);
+                var user = this.GetUserByToken(request.Jwt);
+                if (user == null)
+                {
+                    return BadRequest();
+                }
+                await this.userService.FinishFirstTimePopUpAsync(user.Id, request.FirstName, request.LastName, request.Image, request.Description);
                 return Ok();
             }
             catch (Exception)
@@ -98,7 +105,7 @@ namespace BulgarianPlacesAPI.Controllers
                 {
                     return BadRequest("Invalid token!");
                 }
-                return Ok(new { Id = user.Id, IsAdmin = user.UserType == UserType.Admin });
+                return Ok(new { Id = user.Id, IsAdmin = user.UserType == UserType.Admin, HasCompletedFirstTime = user.HasCompletedFirstTime });
             }
             catch (Exception)
             {
