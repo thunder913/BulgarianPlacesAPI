@@ -47,7 +47,7 @@ namespace BulgarianPlacesAPI.Services
                     Latitude = x.Latitude,
                     Longitude = x.Longitude,
                     Name = x.Name,
-                    Rating = x.Reviews.Where(y => y.Status == ReviewStatus.Approved).Sum(y => y.Rating) / x.Reviews.Count,
+                    Rating = (x.Reviews.Where(y => y.Status == ReviewStatus.Approved).Sum(y => y.Rating)) / (x.Reviews.Count(y => y.Status == ReviewStatus.Approved) != 0 ? x.Reviews.Count(y => y.Status == ReviewStatus.Approved) : 1),
                     Visits = x.Reviews.Where(y => y.Status == ReviewStatus.Approved).Count(),
                 })
                 .SingleOrDefault();
