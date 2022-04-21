@@ -41,7 +41,7 @@ namespace BulgarianPlacesAPI.Services
                 .Select(x => new PlaceReviewDto()
                 {
                     Id = x.Id,
-                    Image = x.Image,
+                    Image = this.blobService.GetBlobUrlAsync(x.Image, "images").GetAwaiter().GetResult(),
                     Date = x.DateCreated.ToString("dd/MM/yyyy"),
                     Comment = x.Description,
                     Creator = "от " + x.User.FirstName + " " + x.User.LastName,

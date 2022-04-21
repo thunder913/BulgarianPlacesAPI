@@ -57,17 +57,17 @@ namespace BlobStorage
             await blobClient.UploadAsync(memoryStream, new BlobHttpHeaders { ContentType = fileName.GetContentType() });
         }
 
-        public async Task UploadBase64StringAsync(string content, string fileName, string blob)
-        {
-            var containerClient = this.blobServiceClient.GetBlobContainerClient(blob);
-            var blobClient = containerClient.GetBlobClient(fileName);
-            Regex regex = new Regex(@"^[\w/\:.-]+;base64,");
-            content = regex.Replace(content, string.Empty);
-            var bytes = Convert.FromBase64String(content);
+    public async Task UploadBase64StringAsync(string content, string fileName, string blob)
+    {
+        var containerClient = this.blobServiceClient.GetBlobContainerClient(blob);
+        var blobClient = containerClient.GetBlobClient(fileName);
+        Regex regex = new Regex(@"^[\w/\:.-]+;base64,");
+        content = regex.Replace(content, string.Empty);
+        var bytes = Convert.FromBase64String(content);
 
-            using var memoryStream = new MemoryStream(bytes);
-            await blobClient.UploadAsync(memoryStream, new BlobHttpHeaders { ContentType = fileName.GetContentType() });
-        }
+        using var memoryStream = new MemoryStream(bytes);
+        await blobClient.UploadAsync(memoryStream, new BlobHttpHeaders { ContentType = fileName.GetContentType() });
+    }
 
         public async Task UploadFileBlobAsync(string filePath, string fileName, string blob)
         {

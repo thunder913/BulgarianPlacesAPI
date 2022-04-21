@@ -1,4 +1,5 @@
-﻿using BulgarianPlacesAPI.Data;
+﻿using BlobStorage;
+using BulgarianPlacesAPI.Data;
 using BulgarianPlacesAPI.Dtos;
 using BulgarianPlacesAPI.Models.Enums;
 using BulgarianPlacesAPI.Services.Interfaces;
@@ -11,10 +12,12 @@ namespace BulgarianPlacesAPI.Services
     public class PlaceService : IPlaceService
     {
         private readonly ApplicationDbContext dbContext;
+        private readonly IBlobService blobService;
 
-        public PlaceService(ApplicationDbContext dbContext)
+        public PlaceService(ApplicationDbContext dbContext, IBlobService blobService)
         {
             this.dbContext = dbContext;
+            this.blobService = blobService;
         }
 
         public List<SearchDto> SearchPlaces(string text)
@@ -26,7 +29,7 @@ namespace BulgarianPlacesAPI.Services
                 .Select(x => new SearchDto()
                 {
                     Id = x.Id,
-                    Image = x.Image,
+                    Image = this.blobService.GetBlobUrlAsync(x.Image, "images").GetAwaiter().GetResult(),
                     LastColumnValue = (x.Reviews.Where(y => y.Status == ReviewStatus.Approved).Sum(y => y.Rating))/(x.Reviews.Count(y => y.Status == ReviewStatus.Approved) != 0 ? x.Reviews.Count(y => y.Status == ReviewStatus.Approved) : 1),
                     Name = x.Name,
                     SearchType = SearchResultType.Place,
@@ -43,7 +46,7 @@ namespace BulgarianPlacesAPI.Services
                 .Select(x => new PlaceDto()
                 {
                     Id = x.Id,
-                    Image = x.Image,
+                    Image = this.blobService.GetBlobUrlAsync(x.Image, "images").GetAwaiter().GetResult(),
                     Latitude = x.Latitude,
                     Longitude = x.Longitude,
                     Name = x.Name,
