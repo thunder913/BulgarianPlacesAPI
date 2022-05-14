@@ -26,7 +26,6 @@ namespace BulgarianPlacesAPI.Controllers
         [HttpPost("add")]
         public async Task<IActionResult> AddReview([FromForm] AddReviewProperties props)
         {
-            //TODO save image to azure or something and then save it as a link in the DB
             try
             {
                 var user = this.GetUserByToken(props.jwt);
